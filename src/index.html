@@ -5,21 +5,28 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Homework 13</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/modern-normalize/1.1.0/modern-normalize.min.css"
+      integrity="sha512-wpPYUAdjBVSE4KJnH1VR1HeZfpl1ub8YT/NKx4PuQ5NmX2tKuGu6U/JRp5y+Y8XG2tV+wKQpNHVUX03MfMFn9Q=="
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
   </head>
 
-  <body>
+  <body class="body">
     
       <form class="search-form" id="search-form">
         <input type="text" name="searchQuery" autocomplete="off" placeholder="Search images..." />
         <button type="submit">Search</button>
       </form>
       
-      <div class="gallery">
-        <!-- Карточки изображений -->
+      <div class="container">
+        <div class="gallery">
+          <!-- Карточки изображений -->
+        </div>
+      </div>
+
+      <div id="tui-pagination-container" class="tui-pagination" >
       </div>
       
-      <button type="button" class="load-more">Load more</button>
 
-    <script src="./index.js" type="module"></script>
+    <script src="./index.js" ></script>
   </body>
 </html>

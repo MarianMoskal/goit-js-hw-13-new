@@ -1,90 +1,99 @@
 'use strict';
 
-// import 'regenerator-runtime/runtime';
 import './css/styles.css';
-import NewsApiService from './newsApiService' 
+import 'tui-pagination/dist/tui-pagination.min.css';
+import Pagination from 'tui-pagination';
+import { optionsForPagination } from './js/options';
+import NewsApiService from './js/newsApiService';
 import Notiflix from 'notiflix';
 import card from './templates/card.hbs';
 
+const itemsPerPage = 40;
 const searchForm = document.querySelector('.search-form');
 const galleryCards = document.querySelector('.gallery');
-const loadMoreBtn = document.querySelector('.load-more');
+const container = document.getElementById('tui-pagination-container');
+const opt = optionsForPagination;
+const setContainerHidden = (arg) => { container.hidden = arg; };
+const newsApiService = new NewsApiService();
 
-loadMoreBtn.classList.add('is-hidden');
+let myPagination;
+
+
+function pagination() {
+     myPagination = new Pagination(container, opt);
+    return myPagination;
+};
+
+setContainerHidden(true);
+newsApiService.itemsPerPage = itemsPerPage;
 
 searchForm.addEventListener('submit', onSubmit);
-loadMoreBtn.addEventListener('click', onLoad);
-
-const newsApiService = new NewsApiService();
 
 async function onSubmit(evt){
     evt.preventDefault();
-
     newsApiService.resetPage();
     newsApiService.query = evt.currentTarget.elements.searchQuery.value;
     
-    loadMoreBtn.classList.remove('is-hidden');
-    
     try {
-            const result = await newsApiService.fetchArticles();
-            
-            if (newsApiService.query.trim() === '' || result.hits.length === 0){    
-                clearCardsContainer();
-                loadMoreBtn.classList.add('is-hidden');
-                Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.');
-            }
-            else {
-                loadMoreBtn.classList.remove('is-hidden');
+        const result = await newsApiService.fetchArticles();
 
-                Notiflix.Notify.success(`"Hooray! We found ${result.totalHits} images."`);
+        opt.totalItems = result.totalHits;
+        opt.page = newsApiService.page;
+
+        pagination();
+            
+        if (newsApiService.query.trim() === '' || result.hits.length === 0)
+            {
+            clearCardsContainer();
+            setContainerHidden(true);
+            Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.');
+            }
+        else {
+                if (result.totalHits > itemsPerPage) {
+                      setContainerHidden(false);
+                    };
+
+                Notiflix.Notify.success(
+                    `"Hooray! We found ${result.totalHits} images."`
+                );
+
                 clearCardsContainer();
                 appendMarkup(result.hits);
+
+                myPagination.on('afterMove', function (eventData) {
+                        newsApiService.page = eventData.page;
+                        onLoadPages()
+                    });
                 }
             }
-            catch (error) {
+    catch (error) {
             console.log(error);
-            }
-}
+        }
+};
 
 
-async function onLoad (){
+async function onLoadPages (){
     try { 
-        loadMoreBtn.disabled = true;
+        clearCardsContainer();
 
         const result = await newsApiService.fetchArticles();
+
         appendMarkup(result.hits);
-
-        loadMoreBtn.disabled = false;
-
-        const lenghtHits = galleryCards.querySelectorAll('.photo-card').length;
-      
-        
-        if (lenghtHits >= result.totalHits) {
-            
-            Notiflix.Notify.failure('"We are sorry, but you have reached the end of search results."');
-            loadMoreBtn.classList.add('is-hidden');
-        } 
-
-    }
-        catch (error){
+        }
+    
+    catch (error){
             console.log(error)
         }
-       
-    } 
+};
     
 
-
-
 function appendMarkup(data) {
-//     // console.log(data);
-    // result = data.map(card).join('');
-    // console.log(result);
    galleryCards.insertAdjacentHTML('beforeend', card(data));
 };
 
 function clearCardsContainer () {
     galleryCards.innerHTML = '';
-}
+};
 
 
 

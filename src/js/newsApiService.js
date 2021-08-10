@@ -6,14 +6,15 @@ export default class NewsApiService {
         this.searchQuery = '';
         this.page = 1;
         this.totalHits = '';
+        this.itemsPerPage = 0;
     };
 
     async fetchArticles() {
-        const url = `https://pixabay.com/api/?key=22788715-8437fcb04a405122d442af916&q=${this.searchQuery}&image_type=photo&orientation=horizontal&safesearch=true&page=${this.page}&per_page=40`;
+        const url = `https://pixabay.com/api/?key=22788715-8437fcb04a405122d442af916&q=${this.searchQuery}&image_type=photo&orientation=horizontal&safesearch=true&page=${this.page}&per_page=${this.itemsPerPage}`;
 
         
         const response = await axios.get(url);
-        this.page +=1;
+        // this.page +=1;
         return response.data;
     };
         
